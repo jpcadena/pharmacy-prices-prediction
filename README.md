@@ -59,8 +59,9 @@
 
 ## About the project
 
-IN PROGRESS...
-[![Project][project-screenshot]]
+IN PROGRESS
+
+![Project][project-screenshot]
 
 This project is about Pharmacy prices prediction...
 
