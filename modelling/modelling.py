@@ -2,7 +2,6 @@
 Neural Network using TensorFlow script
 """
 import logging
-
 import numpy as np
 import pandas as pd
 from modelling.train import training

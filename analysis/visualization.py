@@ -1,13 +1,10 @@
 """
 Visualization script
 """
-import itertools
 import re
-import numpy as np
 import pandas as pd
 import seaborn as sns
-from matplotlib import pyplot as plt, cm
-
+from matplotlib import pyplot as plt
 from core.config import FIG_SIZE, FONT_SIZE, PALETTE, RE_PATTERN, RE_REPL
 
 
@@ -127,53 +124,4 @@ def plot_heatmap(dataframe: pd.DataFrame) -> None:
     plt.title('Heatmap showing correlations among columns',
               fontsize=FONT_SIZE)
     plt.savefig('reports/figures/correlations_heatmap.png')
-    plt.show()
-
-
-def plot_confusion_matrix(
-        conf_matrix: np.ndarray, classes: list[str], name: str,
-        normalize: bool = False, title: str = 'Confusion matrix') -> None:
-    """
-    This function plots the Confusion Matrix of the test and pred arrays
-    :param conf_matrix:
-    :type conf_matrix: np.ndarray
-    :param classes: List of class names
-    :type classes: list[str]
-    :param name: Name of the model
-    :type name: str
-    :param normalize: Whether to normalize the confusion matrix or not. The
-    default is False
-    :type normalize: bool
-    :param title: title for Confusion Matrix plot
-    :type title: str
-    :return: None
-    :rtype: NoneType
-    """
-    if normalize:
-        conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(
-            axis=1)[:, np.newaxis]
-        print("Normalized confusion matrix")
-    else:
-        print('Confusion matrix, without normalization')
-    print(conf_matrix)
-    plt.figure(figsize=FIG_SIZE)
-    plt.rcParams.update({'font.size': 16})
-    plt.imshow(conf_matrix, interpolation='nearest', cmap=cm.get_cmap(
-        'viridis', 8))
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45, color="blue")
-    plt.yticks(tick_marks, classes, color="blue")
-    fmt = '.2f' if normalize else 'd'
-    thresh = conf_matrix.max(initial=0) / 2.
-    for i, j in itertools.product(range(conf_matrix.shape[0]), range(
-            conf_matrix.shape[1])):
-        plt.text(j, i, format(conf_matrix[i, j], fmt),
-                 horizontalalignment="center",
-                 color="red" if conf_matrix[i, j] > thresh else "black")
-    plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.savefig('reports/figures/' + name + '_confusion_matrix.png')
     plt.show()

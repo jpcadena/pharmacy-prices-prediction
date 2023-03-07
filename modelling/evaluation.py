@@ -2,10 +2,8 @@
 Evaluation script including improvement and tests.
 """
 import logging
-
 import numpy as np
-from sklearn.metrics import accuracy_score, precision_score, recall_score, \
-    f1_score, roc_auc_score, confusion_matrix, classification_report
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from core.decorators import with_logging, benchmark
 
 logger: logging.Logger = logging.getLogger(__name__)
@@ -13,31 +11,25 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 @with_logging
 @benchmark
-def evaluate_model(y_pred: np.ndarray, y_test: np.ndarray) -> np.ndarray:
+def evaluate_model(y_pred: np.ndarray, y_test: np.ndarray) -> None:
     """
     Evaluate a binary classification ml_model based on several metrics.
     :param y_pred: Predicted binary labels
     :type y_pred: np.ndarray
     :param y_test: True binary values'
     :type y_test: np.ndarray
-    :return: The confusion matrix
-    :rtype: np.ndarray
+    :return: None
+    :rtype: NoneType
     """
-    accuracy: float = accuracy_score(y_test, y_pred)
-    precision: float = precision_score(y_test, y_pred)
-    recall: float = recall_score(y_test, y_pred)
-    f1_s: float = f1_score(y_test, y_pred)
-    roc_auc: float = roc_auc_score(y_test, y_pred)
-    conf_matrix: np.ndarray = confusion_matrix(y_test, y_pred)
-    print('Accuracy:', accuracy)
-    print('Precision:', precision)
-    print('Recall:', recall)
-    print('F1 Score:', f1_s)
-    print('ROC AUC:', roc_auc)
-    print('Confusion Matrix:')
-    print(conf_matrix)
-    logger.info("Confusion Matrix: %s", conf_matrix)
-    report = classification_report(y_test, y_pred)
-    print(report)
-    logger.info("Some evaluation metrics: %s", report)
-    return conf_matrix
+    mae: float = mean_absolute_error(y_test, y_pred)
+    mse: float = mean_squared_error(y_test, y_pred)
+    r_mse: float = np.sqrt(mse)
+    determination_coefficient: float = r2_score(y_test, y_pred)
+    print('Mean Absolute Error (MAE):', mae)
+    print('Mean Squared Error (MSE):', mse)
+    print('Root Mean Squared Error (RMSE):', r_mse)
+    print('R-squared (R2):', determination_coefficient)
+    logger.info("MAE: %f", mae)
+    logger.info("MSE: %f", mse)
+    logger.info("RMSE: %f", r_mse)
+    logger.info("R2: %f", determination_coefficient)
