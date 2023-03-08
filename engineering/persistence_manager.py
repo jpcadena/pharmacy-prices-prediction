@@ -3,11 +3,15 @@ Persistence script
 """
 import logging
 from enum import Enum
-from typing import Union
+
 import pandas as pd
+from numpy import float16
 from pandas.io.parsers import TextFileReader
-from core.config import CHUNK_SIZE, ENCODING
+
+from core.config import ENCODING
 from core.decorators import with_logging, benchmark
+from modelling.preprocessing import convert_string_to_bool, \
+    convert_str_pct_to_float
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -18,6 +22,7 @@ class DataType(Enum):
     """
     RAW: str = 'data/raw/'
     PROCESSED: str = 'data/processed/'
+    FIGURES: str = 'reports/figures/'
 
 
 class PersistenceManager:
@@ -29,13 +34,13 @@ class PersistenceManager:
     @with_logging
     @benchmark
     def save_to_csv(
-            data: Union[list[dict], pd.DataFrame],
+            data: pd.DataFrame,
             data_type: DataType = DataType.PROCESSED,
             filename: str = 'data.csv') -> bool:
         """
-        Save list of dictionaries as csv file
-        :param data: list of tweets as dictionaries
-        :type data: list[dict]
+        Save a dataframe as csv file
+        :param data: The dataframe to save
+        :type data: pd.DataFrame
         :param data_type: folder where data will be saved: RAW or
          PROCESSED
         :type data_type: DataType
@@ -60,9 +65,8 @@ class PersistenceManager:
     @with_logging
     @benchmark
     def load_from_csv(
-            filename: str = 'drugs_train.csv',
-            data_type: DataType = DataType.RAW, chunk_size: int = CHUNK_SIZE,
-            dtypes: dict = None,
+            filename: str, data_type: DataType, chunk_size: int,
+            dtypes: dict = None, parse_dates: list[str] | None = None
     ) -> pd.DataFrame:
         """
         Load dataframe from CSV using chunk scheme
@@ -75,16 +79,39 @@ class PersistenceManager:
         :type chunk_size: int
         :param dtypes: Dictionary of columns and datatypes
         :type dtypes: dict
+        :param parse_dates: List of date columns to parse
+        :type parse_dates: list[str]
         :return: dataframe retrieved from CSV after optimization with
          chunks
         :rtype: pd.DataFrame
         """
+
+        converters: dict = {
+            'approved_for_hospital_use': convert_string_to_bool,
+            'reimbursement_rate': convert_str_pct_to_float
+        }
+
         filepath: str = f'{data_type.value}{filename}'
         text_file_reader: TextFileReader = pd.read_csv(
             filepath, header=0, chunksize=chunk_size, encoding=ENCODING,
-            dtype=dtypes)
+            converters=converters, parse_dates=parse_dates)
         dataframe: pd.DataFrame = pd.concat(
             text_file_reader, ignore_index=True)
+
+        for key, value in dtypes.items():
+            if value == float16:
+                try:
+                    dataframe[key] = pd.to_numeric(dataframe[key],
+                                                   errors='coerce')
+                    dataframe[key] = dataframe[key].astype(value)
+                except Exception as exc:
+                    logger.error(exc)
+            else:
+                try:
+                    dataframe[key] = dataframe[key].astype(value)
+                except Exception as exc:
+                    logger.error(exc)
+
         logger.info('Dataframe loaded from csv: %s', filepath)
         return dataframe
 

@@ -33,10 +33,10 @@ def visualize_data(dataframe: pd.DataFrame) -> None:
     """
     logger.info("Running visualization")
     plot_count(
-        dataframe, ['radio', 'textura','perímetro','área', 'suavidad',
-                    'compacidad','simetría','dimensión_fractal'],
-        'resultado_diagnóstico')
-    plot_distribution(dataframe['resultado_diagnóstico'], 'lightskyblue')
-    boxplot_dist(dataframe, 'textura', 'perímetro')
-    plot_scatter(dataframe, 'área', 'suavidad', 'resultado_diagnóstico')
+        dataframe, ['price', 'reimbursement_rate'], 'approved_for_hospital_use'
+    )
+    plot_distribution(dataframe['price'], 'lightskyblue')
+    boxplot_dist(dataframe, 'reimbursement_rate', 'price')
+    plot_scatter(
+        dataframe, 'reimbursement_rate', 'price', 'administrative_status')
     plot_heatmap(dataframe)

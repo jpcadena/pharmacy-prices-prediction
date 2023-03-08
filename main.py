@@ -5,6 +5,8 @@ import logging
 import pandas as pd
 from analysis import numerical_eda, visualize_data
 from core import logging_config
+from engineering import transform_data
+from engineering.extraction import extract_raw_data
 from engineering.persistence_manager import PersistenceManager
 
 logging_config.setup_logging()
@@ -18,15 +20,15 @@ def main() -> None:
     :rtype: NoneType
     """
     logger.info("Running main method")
-    dataframe: pd.Dataframe = PersistenceManager.load_from_csv()
-    logger.info(dataframe)
+    dataframe: pd.Dataframe = extract_raw_data()
     try:
-        logger.info("numerical")
         numerical_eda(dataframe)
     except Exception as exc:
         logger.error(exc)
     visualize_data(dataframe)
-    # PersistenceManager.save_to_pickle(dataframe)
+    PersistenceManager.save_to_pickle(dataframe)
+    dataframe = transform_data(dataframe)
+    print(dataframe)
 
 
 if __name__ == '__main__':

@@ -11,6 +11,28 @@ from core.decorators import with_logging, benchmark
 logger: logging.Logger = logging.getLogger(__name__)
 
 
+def convert_string_to_bool(value: str = 'approved_for_hospital_use') -> bool:
+    """
+    Convert the column value to a boolean
+    :param value: The column value to convert
+    :type value: str
+    :return: The boolean value
+    :rtype: bool
+    """
+    return value.lower() == 'oui'
+
+
+def convert_str_pct_to_float(value: str = 'reimbursement_rate') -> np.float16:
+    """
+    Convert the column value to a float16
+    :param value: The column value to convert
+    :type value: str
+    :return: The floating value
+    :rtype: np.float16
+    """
+    return np.float16(value.replace('%', ''))
+
+
 @with_logging
 @benchmark
 def downcast_type(dataframe: pd.DataFrame):

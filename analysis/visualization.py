@@ -6,17 +6,24 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 from core.config import FIG_SIZE, FONT_SIZE, PALETTE, RE_PATTERN, RE_REPL
+from engineering.persistence_manager import DataType
 
 
-def plot_count(dataframe: pd.DataFrame, variables: list, hue: str) -> None:
+def plot_count(
+        dataframe: pd.DataFrame, variables: list, hue: str,
+        data_type: DataType = DataType.FIGURES
+) -> None:
     """
     This method plots the counts of observations from the given variables
-    :param dataframe: dataframe containing tweets info
+    :param dataframe: dataframe containing the raw data
     :type dataframe: pd.DataFrame
-    :param variables: list of columns to plot
+    :param variables: list of discrete columns to plot
     :type variables: list
     :param hue:
     :type hue: str
+    :param data_type: Path where data will be saved: RAW or
+     PROCESSED. The default is FIGURES
+    :type data_type: DataType
     :return: None
     :rtype: NoneType
     """
@@ -31,11 +38,14 @@ def plot_count(dataframe: pd.DataFrame, variables: list, hue: str) -> None:
         plt.xlabel(label, fontsize=15)
         plt.ylabel('Count', fontsize=15)
         plot_iterator += 1
-        plt.savefig(f'reports/figures/discrete_{i}.png')
+        plt.savefig(f'{data_type.value}discrete_{i}.png')
         plt.show()
 
 
-def plot_distribution(df_column: pd.Series, color: str) -> None:
+def plot_distribution(
+        df_column: pd.Series, color: str,
+        data_type: DataType = DataType.FIGURES
+) -> None:
     """
     This method plots the distribution of the given quantitative continuous
     variable
@@ -43,6 +53,9 @@ def plot_distribution(df_column: pd.Series, color: str) -> None:
     :type df_column: pd.Series
     :param color: color for the distribution
     :type color: str
+    :param data_type: Path where data will be saved: RAW or
+     PROCESSED. The default is FIGURES
+    :type data_type: DataType
     :return: None
     :rtype: NoneType
     """
@@ -52,13 +65,13 @@ def plot_distribution(df_column: pd.Series, color: str) -> None:
     plt.title('Distribution Plot for ' + label)
     plt.xlabel(label, fontsize=FONT_SIZE)
     plt.ylabel('Frequency', fontsize=FONT_SIZE)
-    plt.savefig('reports/figures/' + str(df_column.name) + '.png')
+    plt.savefig(f'{data_type.value}{str(df_column.name)}.png')
     plt.show()
 
 
 def boxplot_dist(
-        dataframe: pd.DataFrame, first_variable: str, second_variable: str
-) -> None:
+        dataframe: pd.DataFrame, first_variable: str, second_variable: str,
+        data_type: DataType = DataType.FIGURES) -> None:
     """
     This method plots the distribution of the first variable data
     in regard to the second variable data in a boxplot
@@ -68,6 +81,9 @@ def boxplot_dist(
     :type first_variable: str
     :param second_variable: second variable to plot
     :type second_variable: str
+    :param data_type: Path where data will be saved: RAW or
+     PROCESSED. The default is FIGURES
+    :type data_type: DataType
     :return: None
     :rtype: NoneType
     """
@@ -82,15 +98,16 @@ def boxplot_dist(
     plt.xlabel(x_label, fontsize=FONT_SIZE)
     plt.ylabel(y_label, fontsize=FONT_SIZE)
     plt.savefig(
-        f'reports/figures/discrete_{first_variable}_{second_variable}.png')
+        f'{data_type.value}discrete_{first_variable}_{second_variable}.png')
     plt.show()
 
 
 def plot_scatter(
-        dataframe: pd.DataFrame, x_array: str, y_array: str, hue: str) -> None:
+        dataframe: pd.DataFrame, x_array: str, y_array: str, hue: str,
+        data_type: DataType = DataType.FIGURES) -> None:
     """
     This method plots the relationship between x and y for hue subset
-    :param dataframe: dataframe containing tweets
+    :param dataframe: dataframe containing the data
     :type dataframe: pd.DataFrame
     :param x_array: x-axis column name from dataframe
     :type x_array: str
@@ -98,6 +115,9 @@ def plot_scatter(
     :type y_array: str
     :param hue: grouping variable to filter plot
     :type hue: str
+    :param data_type: Path where data will be saved: RAW or
+     PROCESSED. The default is FIGURES
+    :type data_type: DataType
     :return: None
     :rtype: NoneType
     """
@@ -107,15 +127,20 @@ def plot_scatter(
     label: str = re.sub(pattern=RE_PATTERN, repl=RE_REPL, string=y_array)
     plt.title(f'{x_array} Wise {label} Distribution')
     print(dataframe[[x_array, y_array]].corr())
-    plt.savefig(f'reports/figures/{x_array}_{y_array}_{hue}.png')
+    plt.savefig(f'{data_type.value}{x_array}_{y_array}_{hue}.png')
     plt.show()
 
 
-def plot_heatmap(dataframe: pd.DataFrame) -> None:
+def plot_heatmap(
+        dataframe: pd.DataFrame, data_type: DataType = DataType.FIGURES
+) -> None:
     """
     Plot heatmap to analyze correlation between features
-    :param dataframe: dataframe containing tweets
+    :param dataframe: dataframe containing the data
     :type dataframe: pd.DataFrame
+    :param data_type: Path where data will be saved: RAW or
+     PROCESSED. The default is FIGURES
+    :type data_type: DataType
     :return: None
     :rtype: NoneType
     """
@@ -123,5 +148,5 @@ def plot_heatmap(dataframe: pd.DataFrame) -> None:
     sns.heatmap(data=dataframe.corr(), annot=True, cmap="RdYlGn")
     plt.title('Heatmap showing correlations among columns',
               fontsize=FONT_SIZE)
-    plt.savefig('reports/figures/correlations_heatmap.png')
+    plt.savefig(f'{data_type.value}correlations_heatmap.png')
     plt.show()

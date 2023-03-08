@@ -15,7 +15,7 @@ logger: logging.Logger = logging.getLogger(__name__)
 @benchmark
 def training(
         x_matrix: np.ndarray, dataframe: pd.DataFrame,
-        target_column: str = 'insecurity'
+        target_column: str = 'price'
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Split the data into training and testing sets for a machine
