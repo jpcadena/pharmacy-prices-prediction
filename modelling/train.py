@@ -6,6 +6,8 @@ import logging
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
 from core.decorators import with_logging, benchmark
 
 logger: logging.Logger = logging.getLogger(__name__)
@@ -43,3 +45,15 @@ def training(
     x_train, x_test, y_train, y_test = train_test_split(
         x_array, y_array, test_size=0.2, random_state=0)
     return x_train, x_test, y_train, y_test
+
+
+def scaling(
+        x_train: np.ndarray, x_test: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    scaler: StandardScaler = StandardScaler()
+    num_cols: list[str] = [
+        "num_dosage_forms", "reimbursement_rate",
+        "marketing_declaration_year", "marketing_authorization_year"]
+    x_train[num_cols] = scaler.fit_transform(x_train[num_cols])
+    x_test[num_cols] = scaler.transform(x_test[num_cols])
+    return x_train, x_test

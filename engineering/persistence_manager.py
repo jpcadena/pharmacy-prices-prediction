@@ -3,6 +3,7 @@ Persistence script
 """
 import logging
 from enum import Enum
+from typing import Optional
 
 import pandas as pd
 from numpy import float16
@@ -34,13 +35,13 @@ class PersistenceManager:
     @with_logging
     @benchmark
     def save_to_csv(
-            data: pd.DataFrame,
+            dataframe: pd.DataFrame,
             data_type: DataType = DataType.PROCESSED,
             filename: str = 'data.csv') -> bool:
         """
         Save a dataframe as csv file
-        :param data: The dataframe to save
-        :type data: pd.DataFrame
+        :param dataframe: The dataframe to save
+        :type dataframe: pd.DataFrame
         :param data_type: folder where data will be saved: RAW or
          PROCESSED
         :type data_type: DataType
@@ -49,14 +50,7 @@ class PersistenceManager:
         :return: confirmation for csv file created
         :rtype: bool
         """
-        dataframe: pd.DataFrame
-        if isinstance(data, pd.DataFrame):
-            dataframe = data
-        else:
-            if not data:
-                return False
-            dataframe = pd.DataFrame(data)
-        filepath: str = f'{str(data_type)}{filename}'
+        filepath: str = f'{str(data_type.value)}{filename}'
         dataframe.to_csv(filepath, index=False, encoding=ENCODING)
         logger.info('Dataframe saved as csv: %s', filepath)
         return True
@@ -66,7 +60,8 @@ class PersistenceManager:
     @benchmark
     def load_from_csv(
             filename: str, data_type: DataType, chunk_size: int,
-            dtypes: dict = None, parse_dates: list[str] | None = None
+            dtypes: Optional[dict] = None,
+            parse_dates: Optional[list[str]] = None
     ) -> pd.DataFrame:
         """
         Load dataframe from CSV using chunk scheme
@@ -97,20 +92,20 @@ class PersistenceManager:
             converters=converters, parse_dates=parse_dates)
         dataframe: pd.DataFrame = pd.concat(
             text_file_reader, ignore_index=True)
-
-        for key, value in dtypes.items():
-            if value == float16:
-                try:
-                    dataframe[key] = pd.to_numeric(dataframe[key],
-                                                   errors='coerce')
-                    dataframe[key] = dataframe[key].astype(value)
-                except Exception as exc:
-                    logger.error(exc)
-            else:
-                try:
-                    dataframe[key] = dataframe[key].astype(value)
-                except Exception as exc:
-                    logger.error(exc)
+        if dtypes:
+            for key, value in dtypes.items():
+                if value == float16:
+                    try:
+                        dataframe[key] = pd.to_numeric(dataframe[key],
+                                                       errors='coerce')
+                        dataframe[key] = dataframe[key].astype(value)
+                    except Exception as exc:
+                        logger.error(exc)
+                else:
+                    try:
+                        dataframe[key] = dataframe[key].astype(value)
+                    except Exception as exc:
+                        logger.error(exc)
 
         logger.info('Dataframe loaded from csv: %s', filepath)
         return dataframe

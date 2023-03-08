@@ -32,11 +32,8 @@ def visualize_data(dataframe: pd.DataFrame) -> None:
     :rtype: NoneType
     """
     logger.info("Running visualization")
-    plot_count(
-        dataframe, ['price', 'reimbursement_rate'], 'approved_for_hospital_use'
-    )
+    plot_count(dataframe, ['price', 'reimbursement_rate'])
     plot_distribution(dataframe['price'], 'lightskyblue')
     boxplot_dist(dataframe, 'reimbursement_rate', 'price')
-    plot_scatter(
-        dataframe, 'reimbursement_rate', 'price', 'administrative_status')
+    plot_scatter(dataframe, 'reimbursement_rate', 'price')
     plot_heatmap(dataframe)

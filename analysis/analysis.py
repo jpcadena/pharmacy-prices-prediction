@@ -23,7 +23,6 @@ def analyze_dataframe(dataframe: pd.DataFrame) -> None:
     print(dataframe.shape)
     logger.info(dataframe.shape)
     print(dataframe.dtypes)
-    logger.info(dataframe.dtypes)
     print(dataframe.info(memory_usage='deep'))
     print(dataframe.memory_usage(deep=True))
     print(dataframe.describe(include='all', datetime_is_numeric=True))
@@ -38,9 +37,10 @@ def analyze_dataframe(dataframe: pd.DataFrame) -> None:
         print(non_numeric_df[column].unique())
         print(non_numeric_df[column].value_counts(normalize=True) * 100)
 
-    # administrative_status: imbalanced 99.88-0.12 %
-    # marketing_status: imbalanced 84.8-14.6-0.6-0.01 %
-    # approved_for_hospital_use: imbalanced 82-18 %
-    # route_of_administration: imbalanced 81.13-2.63-2.62-2.07-1.89-... %
-    # marketing_authorization_status: imbalanced 95.39-3.67-0.88-0.07 %
-    # marketing_authorization_process: imbalanced 65.51-13.08-12.35-7.82-1.24 %
+    # Imbalanced classes:
+    # administrative_status: 99.88-0.12% undersampling
+    # marketing_status: 84.8-14.6-0.6-0.01% oversampling
+    # approved_for_hospital_use: 82-18% oversampling
+    # route_of_administration: 81.13-2.63-2.62-2.07-1.89-...%
+    # marketing_authorization_status: 95.39-3.67-0.88-0.07%
+    # marketing_authorization_process: 65.51-13.08-12.35-7.82% oversampling

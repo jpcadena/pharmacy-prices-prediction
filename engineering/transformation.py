@@ -30,6 +30,28 @@ def cast_column(
     return dataframe
 
 
+def find_missing_values(
+        dataframe: pd.DataFrame, how_to_drop: str = "any") -> pd.DataFrame:
+    """
+    Remove missing values from the dataframe
+    :param dataframe: Dirty dataframe to remove missing values from
+    :type dataframe: pd.DataFrame
+    :param how_to_drop: Way to drop row. any or all
+    :type how_to_drop: str
+    :return: Cleaned dataframe
+    :rtype: pd.DataFrame
+    """
+    missing_values: pd.Series = (dataframe.isnull().sum())
+    print(missing_values)
+    if len(missing_values) > 0:
+        logger.warning("FOUND MISSING VALUES")
+        print("FOUND MISSING VALUES")
+        print(missing_values[missing_values > 0])
+        print(missing_values[missing_values > 0] / dataframe.shape[0] * 100)
+        dataframe = dataframe.copy()
+    return dataframe
+
+
 def remove_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:
     """
     Remove missing values from the dataframe

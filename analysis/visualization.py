@@ -2,6 +2,8 @@
 Visualization script
 """
 import re
+from typing import Optional
+
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
@@ -10,7 +12,7 @@ from engineering.persistence_manager import DataType
 
 
 def plot_count(
-        dataframe: pd.DataFrame, variables: list, hue: str,
+        dataframe: pd.DataFrame, variables: list, hue: Optional[str] = None,
         data_type: DataType = DataType.FIGURES
 ) -> None:
     """
@@ -33,7 +35,10 @@ def plot_count(
     for i in variables:
         plt.subplot(1, 3, plot_iterator)
         print()
-        sns.countplot(x=dataframe[i], hue=dataframe[hue], palette=PALETTE)
+        if hue:
+            sns.countplot(x=dataframe[i], hue=dataframe[hue], palette=PALETTE)
+        else:
+            sns.countplot(x=dataframe[i], palette=PALETTE)
         label = re.sub(pattern=RE_PATTERN, repl=RE_REPL, string=i)
         plt.xlabel(label, fontsize=15)
         plt.ylabel('Count', fontsize=15)
@@ -103,8 +108,9 @@ def boxplot_dist(
 
 
 def plot_scatter(
-        dataframe: pd.DataFrame, x_array: str, y_array: str, hue: str,
-        data_type: DataType = DataType.FIGURES) -> None:
+        dataframe: pd.DataFrame, x_array: str, y_array: str,
+        hue: Optional[str] = None, data_type: DataType = DataType.FIGURES
+) -> None:
     """
     This method plots the relationship between x and y for hue subset
     :param dataframe: dataframe containing the data

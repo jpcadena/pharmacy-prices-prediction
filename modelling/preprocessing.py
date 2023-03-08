@@ -4,9 +4,14 @@ Preprocessing section including: Formatting, Cleaning, Anonymization, Sampling
 import logging
 import numpy as np
 import pandas as pd
+from imblearn.under_sampling import RandomUnderSampler
 from matplotlib import pyplot as plt
 from sklearn.neighbors import LocalOutlierFactor
+from sklearn.preprocessing import LabelEncoder
+from sklearn.utils import resample
+
 from core.decorators import with_logging, benchmark
+from engineering.transformation import find_missing_values
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -117,3 +122,97 @@ def clear_outliers(dataframe: pd.DataFrame, column: str) -> pd.DataFrame:
     print(df_outlier)
     logger.warning(df_outlier.shape)
     return dataframe
+
+
+def oversample_data(dataframe: pd.DataFrame, column_name: str) -> pd.DataFrame:
+    """
+    Perform oversampling on the specified column
+    :param dataframe: The dataframe to oversample
+    :type dataframe: pd.DataFrame
+    :param column_name: The name of the column to oversample
+    :type column_name: str
+    :return: The oversampled dataframe
+    :rtype: pd.DataFrame
+    """
+    # Get the minority class and its count
+    minority_class = dataframe[column_name].value_counts().idxmin()
+    minority_class_count = dataframe[column_name].value_counts()[
+        minority_class]
+
+    # Create a list of dataframes, one for each class
+    dfs: list[pd.DataFrame] = [
+        dataframe[dataframe[column_name] == cls] for cls in
+        dataframe[column_name].unique()]
+
+    # Oversample the minority class
+    oversampled_minority = resample(
+        dfs[dataframe[column_name].unique().index(minority_class)],
+        replace=True, n_samples=dataframe[column_name].value_counts().max(),
+        random_state=42)
+
+    # Append the oversampled minority class to the list of dataframes
+    dfs.append(oversampled_minority)
+
+    # Concatenate the dataframes and return the result
+    return pd.concat(dfs)
+
+
+# def undersample_data(
+#         dataframe: pd.DataFrame, column_name: str) -> pd.DataFrame:
+#     """
+#     Perform under sampling on the specified column
+#     :param dataframe: The dataframe to under-sample
+#     :type dataframe: pd.DataFrame
+#     :param column_name: The name of the column to under-sample
+#     :type column_name: str
+#     :return: The under-sampled dataframe
+#     :rtype: pd.DataFrame
+#     """
+#     majority_class: str = dataframe[column_name].value_counts().idxmax()
+#     majority_class_count: int = dataframe[column_name].value_counts()[
+#         majority_class]
+#     dfs: list[pd.DataFrame] = [
+#         dataframe[dataframe[column_name] == cls] for cls in
+#         dataframe[column_name].unique()]
+#     majority_class_index: int = list(dataframe[column_name].unique()).index(
+#         majority_class)
+#     undersampled_majority: pd.DataFrame = dfs[majority_class_index].sample(
+#         n=majority_class_count, random_state=42)
+#     dfs.pop(majority_class_index)
+#     dfs.append(undersampled_majority)
+#     return pd.concat(dfs)
+
+def undersample_data(
+        dataframe: pd.DataFrame, column_name: str) -> pd.DataFrame:
+    """
+    Perform under-sampling on the specified column using
+     RandomUnderSampler from imblearn.
+    :param dataframe: The dataframe to under-sample
+    :type dataframe: pd.DataFrame
+    :param column_name: The name of the column to under-sample
+    :type column_name: str
+    :return: The under-sampled dataframe
+    :rtype: pd.DataFrame
+    """
+    # separate features and target
+    X = dataframe.drop(columns=[column_name])
+    y = dataframe[column_name]
+
+    # encode target column as numeric
+    label_encoder: LabelEncoder = LabelEncoder()
+    y_numeric = label_encoder.fit_transform(y)
+    print(y_numeric)
+
+    # define the undersampling strategy
+    undersampler = RandomUnderSampler(sampling_strategy=0.5, random_state=42)
+    # fit and apply the undersampling strategy
+    # TODO: Requires all numerical features
+    X_undersampled, y_undersampled = undersampler.fit_resample(X, y_numeric)
+    # decode target column back to original categorical values
+    y_undersampled = label_encoder.inverse_transform(y_undersampled)
+
+    # combine the undersampled features and target into a new DataFrame
+    df_undersampled = pd.concat([X_undersampled, y_undersampled], axis=1)
+    return df_undersampled
+
+# Other techniques could be: Cost-Sensitive Learning and Anomaly Detection
