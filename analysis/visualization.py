@@ -1,6 +1,7 @@
 """
 Visualization script
 """
+import logging
 import re
 from typing import Optional
 
@@ -9,6 +10,8 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 from core.config import FIG_SIZE, FONT_SIZE, PALETTE, RE_PATTERN, RE_REPL
 from engineering.persistence_manager import DataType
+
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 def plot_count(
@@ -34,7 +37,6 @@ def plot_count(
     plot_iterator: int = 1
     for i in variables:
         plt.subplot(1, 3, plot_iterator)
-        print()
         if hue:
             sns.countplot(x=dataframe[i], hue=dataframe[hue], palette=PALETTE)
         else:
@@ -151,7 +153,8 @@ def plot_heatmap(
     :rtype: NoneType
     """
     plt.figure(figsize=FIG_SIZE)
-    sns.heatmap(data=dataframe.corr(), annot=True, cmap="RdYlGn")
+    data: pd.DataFrame = dataframe.corr()
+    sns.heatmap(data=data, annot=True, cmap="RdYlGn")
     plt.title('Heatmap showing correlations among columns',
               fontsize=FONT_SIZE)
     plt.savefig(f'{data_type.value}correlations_heatmap.png')

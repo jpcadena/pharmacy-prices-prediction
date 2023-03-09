@@ -18,7 +18,6 @@ def numerical_eda(dataframe: pd.DataFrame) -> None:
     :return: None
     :rtype: NoneType
     """
-    print("test")
     logger.info("Running Exploratory Data Analysis")
     analyze_dataframe(dataframe)
 
@@ -32,8 +31,8 @@ def visualize_data(dataframe: pd.DataFrame) -> None:
     :rtype: NoneType
     """
     logger.info("Running visualization")
+    plot_heatmap(dataframe)
     plot_count(dataframe, ['price', 'reimbursement_rate'])
     plot_distribution(dataframe['price'], 'lightskyblue')
     boxplot_dist(dataframe, 'reimbursement_rate', 'price')
     plot_scatter(dataframe, 'reimbursement_rate', 'price')
-    plot_heatmap(dataframe)

@@ -2,22 +2,19 @@
 Main script
 """
 import logging
-
-import numpy as np
 import pandas as pd
-from numpy import float16
-
+from numpy import float16, uint16
 from analysis import numerical_eda, visualize_data
 from core import logging_config
-from core.config import CHUNK_SIZE
-from engineering import transform_data
+from core.config import NUMERICS
 from engineering.extraction import extract_raw_data
-from engineering.persistence_manager import PersistenceManager, DataType
-from engineering.transformation import find_missing_values
-from modelling.preprocessing import undersample_data
+from engineering.persistence_manager import PersistenceManager
+from models.models import iterate_models, iterate_nn_models
 
 logging_config.setup_logging()
 logger: logging.Logger = logging.getLogger(__name__)
+pd.set_option('display.max_columns', 100)
+pd.set_option('display.max_rows', 100)
 
 
 def main() -> None:
@@ -42,10 +39,13 @@ def main() -> None:
     #     drugs_train, 'administrative_status')
 
     active_ingredients: pd.DataFrame = extract_raw_data(
-        filename='active_ingredients.csv', parse_dates=None)
+        filename='active_ingredients.csv')
     drug_label_feature_eng: pd.DataFrame = extract_raw_data(
-        filename='drug_label_feature_eng.csv', parse_dates=None)
-
+        filename='drug_label_feature_eng.csv')
+    numeric_cols = drug_label_feature_eng.select_dtypes(
+        include=NUMERICS).columns
+    drug_label_feature_eng[numeric_cols] = drug_label_feature_eng[
+        numeric_cols].astype('uint8')
     dataframe: pd.DataFrame = drugs_train.merge(
         active_ingredients, on="drug_id")
     dataframe = dataframe.merge(drug_label_feature_eng, on="description")
@@ -55,42 +55,35 @@ def main() -> None:
     print(dataframe.shape)
     print(dataframe.dtypes)
 
+    visualize_data(drugs_train)
+
     dataframe = pd.get_dummies(
         dataframe, columns=[
-            "dosage_form", "route_of_administration",
-            "active_ingredient", "pharmaceutical_companies"])
-    print(dataframe.shape)
-    print(dataframe.dtypes)
+            "dosage_form",  # 19
+            "pharmaceutical_companies",  # 33
+            "active_ingredient",
+            "route_of_administration", "administrative_status",
+            "marketing_status", "approved_for_hospital_use",
+            "marketing_authorization_status",
+            "marketing_authorization_process"], dtype=uint16)
 
     # Fixme: Undersample with numerical values
-    dataframe_undersampled: pd.DataFrame = undersample_data(
-        dataframe, 'administrative_status')
-    print(dataframe_undersampled.head)
-    print(dataframe_undersampled.shape)
-    print(dataframe.dtypes)
+    # dataframe_undersampled: pd.DataFrame = undersample_data(
+    #     dataframe, 'administrative_status')
 
-    # dataframe["num_dosage_forms"] = dataframe["description"].apply(
-    #     lambda x: int(x.split()[0]) if x.split()[0].isdigit() else 0)
-    # dataframe["marketing_declaration_year"] = dataframe[
-    #     "marketing_declaration_date"].apply(
-    #     lambda x: int(str(x)[:4]))
-    # dataframe["marketing_authorization_year"] = dataframe[
-    #     "marketing_authorization_date"].apply(lambda x: int(str(x)[:4]))
-    # count_cols = [col for col in dataframe.columns if
-    #               col.startswith("count_")]
-    # for col in count_cols:
-    #     dataframe[col.replace("count", "has")] = np.where(
-    #         dataframe[col] > 0, 1, 0)
-    # try:
-    #     numerical_eda(dataframe)
-    # except Exception as exc:
-    #     logger.error(exc)
-    # # visualize_data(dataframe)
-    # PersistenceManager.save_to_pickle(dataframe)
-    # # dataframe = transform_data(dataframe)
-    # print(dataframe)
-    # saved: bool = PersistenceManager.save_to_csv(dataframe)
-    # print(saved)
+    dataframe["marketing_declaration_year"] = dataframe[
+        "marketing_declaration_date"].dt.year.astype("uint16")
+    dataframe["marketing_authorization_year"] = dataframe[
+        "marketing_authorization_date"].dt.year.astype("uint16")
+    dataframe = dataframe.drop(
+        ["marketing_declaration_date", "marketing_authorization_date"], axis=1)
+    PersistenceManager.save_to_pickle(dataframe)
+    # dataframe = transform_data(dataframe)
+    saved: bool = PersistenceManager.save_to_csv(dataframe)
+    print(saved)
+    numerical_eda(dataframe)
+    iterate_models(dataframe)
+    iterate_nn_models(dataframe)
 
 
 if __name__ == '__main__':

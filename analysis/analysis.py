@@ -3,11 +3,13 @@ First Analysis script
 """
 import logging
 import pandas as pd
+
+from core.config import NUMERICS
 from core.decorators import with_logging, benchmark
 
 logger: logging.Logger = logging.getLogger(__name__)
-pd.set_option('display.max_columns', 20)
-
+pd.set_option('display.max_columns', 100)
+pd.set_option('display.max_rows', 50)
 
 @with_logging
 @benchmark
@@ -19,20 +21,16 @@ def analyze_dataframe(dataframe: pd.DataFrame) -> None:
     :return: None
     :rtype: NoneType
     """
-    print(dataframe.head())
-    print(dataframe.shape)
+    # print(dataframe.head())
+    # print(dataframe.shape)
     logger.info(dataframe.shape)
     print(dataframe.dtypes)
     print(dataframe.info(memory_usage='deep'))
     print(dataframe.memory_usage(deep=True))
     print(dataframe.describe(include='all', datetime_is_numeric=True))
-    non_numeric_df = dataframe.select_dtypes(exclude=[
-        'uint8', 'uint16', 'uint32', 'uint64',
-        'int8', 'int16', 'int32',
-        'int64',
-        'float16', 'float32', 'float64'])
+    non_numeric_df = dataframe.select_dtypes(exclude=NUMERICS)
     for column in non_numeric_df.columns:
-        print(column)
+        print("column:", column)
         print(non_numeric_df[column].value_counts())
         print(non_numeric_df[column].unique())
         print(non_numeric_df[column].value_counts(normalize=True) * 100)

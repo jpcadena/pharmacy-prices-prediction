@@ -2,16 +2,16 @@
 Preprocessing section including: Formatting, Cleaning, Anonymization, Sampling
 """
 import logging
+
 import numpy as np
 import pandas as pd
 from imblearn.under_sampling import RandomUnderSampler
 from matplotlib import pyplot as plt
 from sklearn.neighbors import LocalOutlierFactor
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.utils import resample
 
 from core.decorators import with_logging, benchmark
-from engineering.transformation import find_missing_values
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -216,3 +216,20 @@ def undersample_data(
     return df_undersampled
 
 # Other techniques could be: Cost-Sensitive Learning and Anomaly Detection
+
+
+def scale_data(x_train: np.ndarray, x_test: np.ndarray
+               ) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Scale the features data
+    :param x_train: The training data
+    :type x_train: np.ndarray
+    :param x_test: The test data
+    :type x_test: np.ndarray
+    :return: The scaled data
+    :rtype:
+    """
+    scaler: StandardScaler = StandardScaler()
+    x_train_scaled = scaler.fit_transform(x_train)
+    x_test_scaled = scaler.transform(x_test)
+    return x_train_scaled, x_test_scaled

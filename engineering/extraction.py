@@ -2,9 +2,7 @@
 Extraction script for Engineering module
 """
 from typing import Optional
-
 import pandas as pd
-from numpy import float16
 from core.config import CHUNK_SIZE
 from engineering.persistence_manager import PersistenceManager, DataType
 
