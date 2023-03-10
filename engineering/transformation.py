@@ -3,12 +3,10 @@ Transformation script for Engineering module
 """
 import logging
 import re
-from typing import Any
 import numpy as np
 import pandas as pd
 
 logger: logging.Logger = logging.getLogger(__name__)
-# TODO: Fix the Feature engineering
 
 
 def remove_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:

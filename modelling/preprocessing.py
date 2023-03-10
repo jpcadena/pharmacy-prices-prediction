@@ -195,24 +195,25 @@ def undersample_data(
     :rtype: pd.DataFrame
     """
     # separate features and target
-    X = dataframe.drop(columns=[column_name])
-    y = dataframe[column_name]
+    x_array = dataframe.drop(columns=[column_name])
+    y_array = dataframe[column_name]
 
     # encode target column as numeric
     label_encoder: LabelEncoder = LabelEncoder()
-    y_numeric = label_encoder.fit_transform(y)
+    y_numeric = label_encoder.fit_transform(y_array)
     print(y_numeric)
 
     # define the undersampling strategy
     undersampler = RandomUnderSampler(sampling_strategy=0.5, random_state=42)
     # fit and apply the undersampling strategy
     # TODO: Requires all numerical features
-    X_undersampled, y_undersampled = undersampler.fit_resample(X, y_numeric)
+    x_undersampled, y_undersampled = undersampler.fit_resample(x_array,
+                                                               y_numeric)
     # decode target column back to original categorical values
     y_undersampled = label_encoder.inverse_transform(y_undersampled)
 
     # combine the undersampled features and target into a new DataFrame
-    df_undersampled = pd.concat([X_undersampled, y_undersampled], axis=1)
+    df_undersampled = pd.concat([x_undersampled, y_undersampled], axis=1)
     return df_undersampled
 
 # Other techniques could be: Cost-Sensitive Learning and Anomaly Detection

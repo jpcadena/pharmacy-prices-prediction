@@ -169,8 +169,6 @@ local.properties
 
 ### Node template
 # Logs
-logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -1196,3 +1194,6 @@ FodyWeavers.xsd
 # Google App Engine generated folder
 appengine-generated/
 /models/KNeighborsRegressor.joblib
+/models/SVR.joblib
+!/logs/log-10-Mar-2023-16-02-21.log
+!/logs/

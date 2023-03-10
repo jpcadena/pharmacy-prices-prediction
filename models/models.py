@@ -6,7 +6,7 @@ import pandas as pd
 from catboost import CatBoostRegressor
 from lightgbm import LGBMRegressor
 from sklearn.ensemble import AdaBoostRegressor, \
-    GradientBoostingRegressor
+    GradientBoostingRegressor, RandomForestRegressor
 from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.svm import SVR
@@ -52,10 +52,8 @@ def iterate_models(
     models: list = [
         LinearRegression(), DecisionTreeRegressor(),
         KNeighborsRegressor(), AdaBoostRegressor(),
-        GradientBoostingRegressor(), SGDRegressor(),
-        # Fixme: Analyze these 2 ML models
-        SVR(),
-        # RandomForestRegressor(),
+        GradientBoostingRegressor(), SGDRegressor(), SVR(),
+        RandomForestRegressor(),
     ]
     models.extend(boost_obj)
     model_names: list[str] = []

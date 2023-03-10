@@ -12,9 +12,11 @@ from keras.models import save_model as save_nn_model
 from lightgbm import LGBMRegressor
 from numpy import float16
 from pandas.io.parsers import TextFileReader
-from sklearn.ensemble import AdaBoostRegressor, GradientBoostingRegressor
+from sklearn.ensemble import AdaBoostRegressor, GradientBoostingRegressor, \
+    RandomForestRegressor
 from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
 from core.config import ENCODING
@@ -190,8 +192,9 @@ def save_model(model, model_name: str, data_type: DataType = DataType.MODELS):
         model.booster_.save_model(
             f'{data_type.value}{model_name}{file_extension}')
     elif isinstance(model, (
-            AdaBoostRegressor, DecisionTreeRegressor, LinearRegression,
-            GradientBoostingRegressor, KNeighborsRegressor, SGDRegressor)):
+            AdaBoostRegressor, DecisionTreeRegressor, LinearRegression, SVR,
+            GradientBoostingRegressor, KNeighborsRegressor, SGDRegressor,
+            RandomForestRegressor)):
         file_extension = '.joblib'
         joblib.dump(model, f'{data_type.value}{model_name}{file_extension}')
     elif isinstance(model, Sequential):

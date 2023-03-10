@@ -3,7 +3,7 @@ Config script
 """
 import os
 from dotenv import load_dotenv
-from numpy import uint8, uint16, float16
+from numpy import uint8, uint16
 
 dotenv_path: str = '.env'
 load_dotenv(dotenv_path=dotenv_path)
