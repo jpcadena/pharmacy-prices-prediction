@@ -6,9 +6,11 @@ import numpy as np
 import pandas as pd
 from imblearn.under_sampling import RandomUnderSampler
 from matplotlib import pyplot as plt
+from numpy import uint16
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.utils import resample
+from core.config import NUMERICS
 from core.decorators import with_logging, benchmark
 
 logger: logging.Logger = logging.getLogger(__name__)
@@ -231,3 +233,102 @@ def scale_data(x_train: np.ndarray, x_test: np.ndarray
     x_train_scaled = scaler.fit_transform(x_train)
     x_test_scaled = scaler.transform(x_test)
     return x_train_scaled, x_test_scaled
+
+
+def numeric_features(dataframe: pd.DataFrame) -> pd.DataFrame:
+    """
+    Preprocess the features data
+    :param dataframe: The raw dataframe
+    :type dataframe: pd.DataFrame
+    :return: The preprocessed dataframe
+    :rtype: pd.DataFrame
+    """
+    numeric_cols = dataframe.select_dtypes(include=NUMERICS).columns
+    dataframe[numeric_cols] = dataframe[numeric_cols].astype('uint8')
+    return dataframe
+
+
+def merge_dataframes(
+        left_dataframe: pd.DataFrame, right_dataframe: pd.DataFrame,
+        join_on: str = 'drug_id'
+) -> pd.DataFrame:
+    """
+    Merge the dataframes onto another data
+    :param left_dataframe: The left dataframe
+    :type left_dataframe: pd.DataFrame
+    :param right_dataframe: The right dataframe
+    :type right_dataframe: pd.DataFrame
+    :param join_on: Column to join on. The default is drug_id
+    :type join_on: str
+    :return: The merged dataframe
+    :rtype: pd.DataFrame
+    """
+    return left_dataframe.merge(right_dataframe, on=join_on)
+
+
+def drop_by_columns(
+        dataframe: pd.DataFrame, labels: list[str]
+) -> pd.DataFrame:
+    """
+    Drop a list of columns from a dataframe
+    :param dataframe: The dataframe to drop columns from
+    :type dataframe: pd.DataFrame
+    :param labels: The list of columns to drop
+    :type labels: list[str]
+    :return: The dataframe with drop columns
+    :rtype: pd.DataFrame
+    """
+    return dataframe.drop(labels, axis=1)
+
+
+def preprocess(
+        raw_dataframe: pd.DataFrame, additional_df: pd.DataFrame,
+        other_df: pd.DataFrame) -> \
+        pd.DataFrame:
+    """
+    Preprocess function including cast, merge and drop
+    :param raw_dataframe: The raw dataframe
+    :type raw_dataframe: pd.DataFrame
+    :param additional_df: First dataframe to merge into the raw one
+    :type additional_df: pd.DataFrame
+    :param other_df: Other dataframe to merge into the raw one
+    :type other_df: pd.DataFrame
+    :return: The preprocessed dataframe
+    :rtype: pd.DataFrame
+    """
+    labels: list[str] = ["drug_id", "description"]
+    num_dataframe: pd.DataFrame = numeric_features(raw_dataframe)
+    merged_dataframe: pd.DataFrame = merge_dataframes(
+        num_dataframe, additional_df)
+    dataframe: pd.DataFrame = merge_dataframes(
+        merged_dataframe, other_df, labels[1])
+    cleaned_df: pd.DataFrame = drop_by_columns(dataframe, labels)
+    cleaned_df = cleaned_df.dropna(axis=1)
+    return cleaned_df
+
+
+def feature_engineering(preprocessed_dataframe: pd.DataFrame):
+    """
+    Feature engineering function for a dataframe
+    :param preprocessed_dataframe: The preprocessed dataframe
+    :type preprocessed_dataframe: pd.DataFrame
+    :return: The full dataframe with new features
+    :rtype: pd.DataFrame
+    """
+    date_labels: list[str] = [
+        "marketing_declaration_date", "marketing_authorization_date"]
+    dataframe = pd.get_dummies(
+        preprocessed_dataframe,
+        columns=[
+            "dosage_form", "pharmaceutical_companies",
+            "active_ingredient", "route_of_administration",
+            "administrative_status", "marketing_status",
+            "approved_for_hospital_use", "marketing_authorization_status",
+            "marketing_authorization_process"
+        ], dtype=uint16)
+    dataframe["marketing_declaration_year"] = dataframe[
+        date_labels[0]].dt.year.astype("uint16")
+    dataframe["marketing_authorization_year"] = dataframe[
+        date_labels[1]].dt.year.astype("uint16")
+    clean_dataframe: pd.DataFrame = drop_by_columns(dataframe, date_labels)
+    return clean_dataframe

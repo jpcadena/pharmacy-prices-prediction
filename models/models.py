@@ -9,6 +9,7 @@ from sklearn.ensemble import AdaBoostRegressor, \
     GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
 from core.decorators import with_logging, benchmark
@@ -53,7 +54,7 @@ def iterate_models(
         KNeighborsRegressor(), AdaBoostRegressor(),
         GradientBoostingRegressor(), SGDRegressor(),
         # Fixme: Analyze these 2 ML models
-        # SVR(),
+        SVR(),
         # RandomForestRegressor(),
     ]
     models.extend(boost_obj)
