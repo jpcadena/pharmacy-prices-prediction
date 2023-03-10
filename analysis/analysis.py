@@ -11,6 +11,7 @@ logger: logging.Logger = logging.getLogger(__name__)
 pd.set_option('display.max_columns', 100)
 pd.set_option('display.max_rows', 50)
 
+
 @with_logging
 @benchmark
 def analyze_dataframe(dataframe: pd.DataFrame) -> None:

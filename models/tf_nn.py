@@ -8,6 +8,8 @@ import tensorflow as tf
 from keras import backend as K
 from keras.layers import Dense, LSTM, GRU
 from keras.models import Sequential
+
+from engineering.persistence_manager import save_model
 from modelling.evaluation import evaluate_model
 from modelling.train import training
 from core.decorators import with_logging, benchmark
@@ -48,14 +50,14 @@ def predict_nn(
     sequential: Sequential = Sequential()
     x_train, x_test, y_train, y_test = training(dataframe, target_column)
     print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
-    # Fixme: x_train shape?
+    input_shape = input_shape = (x_train.shape[1], 1)
     if layer == 'LSTM':
         sequential.add(
-            LSTM(100, input_shape=(1, x_train.shape[2]),
+            LSTM(100, input_shape=input_shape,
                  return_sequences=False))
     elif layer == 'GRU':
         sequential.add(
-            GRU(100, input_shape=(1, x_train.shape[2]),
+            GRU(100, input_shape=input_shape,
                 return_sequences=False))
     sequential.add(Dense(1, activation='linear'))
     sequential.compile(loss='mean_squared_error', optimizer='adam',
@@ -64,6 +66,7 @@ def predict_nn(
     y_pred: np.ndarray = sequential.predict(x_test)
     logger.info("NN y_pred: %s", y_pred)
     logger.info("NN y_test: %s", y_test)
+    save_model(sequential, layer)
     return y_pred, y_test
 
 

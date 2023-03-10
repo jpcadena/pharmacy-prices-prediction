@@ -46,6 +46,15 @@ def training(dataframe: pd.DataFrame, target_column: str = 'price'
 def scaling(
         x_train: np.ndarray, x_test: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Scaling function for training and testing
+    :param x_train: Training set
+    :type x_train: np.ndarray
+    :param x_test: Testing set
+    :type x_test: np.ndarray
+    :return: Both training and test data scaled
+    :rtype: tuple[np.ndarray, np.ndarray]
+    """
     scaler: StandardScaler = StandardScaler()
     num_cols: list[str] = [
         "num_dosage_forms", "reimbursement_rate",

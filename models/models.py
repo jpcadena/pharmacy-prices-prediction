@@ -5,15 +5,14 @@ import logging
 import pandas as pd
 from catboost import CatBoostRegressor
 from lightgbm import LGBMRegressor
-from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, \
+from sklearn.ensemble import AdaBoostRegressor, \
     GradientBoostingRegressor
 from sklearn.linear_model import LinearRegression, SGDRegressor
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
 from core.decorators import with_logging, benchmark
+from engineering.persistence_manager import save_model
 from modelling.evaluation import evaluate_model
 from modelling.modelling import predict_model
 from models.tf_nn import model_nn
@@ -24,8 +23,7 @@ logger: logging.Logger = logging.getLogger(__name__)
 @with_logging
 @benchmark
 def iterate_models(
-        dataframe: pd.DataFrame, target_column: str = 'price',
-        gpu: bool = True
+        dataframe: pd.DataFrame, target_column: str = 'price', gpu: bool = True
 ) -> None:
     """
     Iterates through a list of machine learning models and evaluates
@@ -52,13 +50,13 @@ def iterate_models(
         boost_obj = [XGBRegressor(), CatBoostRegressor(), LGBMRegressor()]
     models: list = [
         LinearRegression(), DecisionTreeRegressor(),
-
-
         KNeighborsRegressor(), AdaBoostRegressor(),
         GradientBoostingRegressor(), SGDRegressor(),
         # Fixme: Analyze these 2 ML models
         # SVR(),
         # RandomForestRegressor(),
+        # decision_tree_regressor, adaboost_regressor,
+        # gradient_boosting_regressor, xgboost, catboost, lgbm
     ]
     models.extend(boost_obj)
     model_names: list[str] = []
@@ -74,8 +72,10 @@ def iterate_models(
     for model, model_name, boost in zip(models, model_names, boost_models):
         print('\n\n', model_name)
         logger.info(model_name)
-        y_pred, y_test = predict_model(dataframe, model, target_column, boost)
+        y_pred, y_test = predict_model(
+            dataframe, model, target_column, boost)
         evaluate_model(y_pred, y_test)
+        save_model(model, model_name)
 
 
 def iterate_nn_models(

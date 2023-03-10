@@ -15,8 +15,8 @@ logger: logging.Logger = logging.getLogger(__name__)
 @with_logging
 @benchmark
 def predict_model(
-        dataframe: pd.DataFrame, ml_model, target_column: str = 'price',
-        boost: bool = False
+        dataframe: pd.DataFrame, ml_model,
+        target_column: str = 'price', boost: bool = False
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Predicts the target variable values using the provided model and

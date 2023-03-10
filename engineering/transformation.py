@@ -31,13 +31,11 @@ def cast_column(
 
 
 def find_missing_values(
-        dataframe: pd.DataFrame, how_to_drop: str = "any") -> pd.DataFrame:
+        dataframe: pd.DataFrame) -> pd.DataFrame:
     """
     Remove missing values from the dataframe
     :param dataframe: Dirty dataframe to remove missing values from
     :type dataframe: pd.DataFrame
-    :param how_to_drop: Way to drop row. any or all
-    :type how_to_drop: str
     :return: Cleaned dataframe
     :rtype: pd.DataFrame
     """

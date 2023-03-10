@@ -5,9 +5,19 @@ import logging
 from enum import Enum
 from typing import Optional
 
+import joblib
 import pandas as pd
+from catboost import CatBoostRegressor
+from keras import Sequential
+from keras.models import save_model as save_nn_model
+from lightgbm import LGBMRegressor
 from numpy import float16
 from pandas.io.parsers import TextFileReader
+from sklearn.ensemble import AdaBoostRegressor, GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from xgboost import XGBRegressor
 
 from core.config import ENCODING
 from core.decorators import with_logging, benchmark
@@ -24,6 +34,7 @@ class DataType(Enum):
     RAW: str = 'data/raw/'
     PROCESSED: str = 'data/processed/'
     FIGURES: str = 'reports/figures/'
+    MODELS: str = 'models/'
 
 
 class PersistenceManager:
@@ -153,3 +164,40 @@ class PersistenceManager:
         dataframe: pd.DataFrame = pd.read_pickle(filepath)
         logger.info('Dataframe loaded from pickle: %s', filepath)
         return dataframe
+
+
+def save_model(model, model_name: str, data_type: DataType = DataType.MODELS):
+    """
+    Save a machine learning model to a file using joblib or Keras.
+    :param model: The model instance
+    :type model: obj
+    :param model_name: The model name
+    :type model_name: str
+    :param data_type: Path where the model will be saved. The default
+     is MODELS
+    :type data_type: DataType
+    :return: None
+    :rtype: NoneType
+    """
+    # Fixme: Refactor function to not use if-clauses and isinstance
+    if isinstance(model, XGBRegressor):
+        file_extension = '.json'
+        model.save_model(
+            f'{data_type.value}{model_name}{file_extension}')
+    elif isinstance(model, CatBoostRegressor):
+        file_extension = '.cbm'
+        model.save_model(f'{data_type.value}{model_name}{file_extension}')
+    elif isinstance(model, LGBMRegressor):
+        file_extension = '.txt'
+        model.booster_.save_model(
+            f'{data_type.value}{model_name}{file_extension}')
+    elif isinstance(model, (
+            AdaBoostRegressor, DecisionTreeRegressor, LinearRegression,
+            GradientBoostingRegressor, KNeighborsRegressor, SGDRegressor)):
+        file_extension = '.joblib'
+        joblib.dump(model, f'{data_type.value}{model_name}{file_extension}')
+    elif isinstance(model, Sequential):
+        file_extension = '.h5'
+        save_nn_model(model, f'{data_type.value}{model_name}{file_extension}')
+    else:
+        raise ValueError(f"Model type not supported: {type(model)}")
