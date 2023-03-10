@@ -3,7 +3,6 @@ First Analysis script
 """
 import logging
 import pandas as pd
-
 from core.config import NUMERICS
 from core.decorators import with_logging, benchmark
 

@@ -2,10 +2,8 @@
 Main script
 """
 import logging
-
 import pandas as pd
 from numpy import float16, uint16
-
 from analysis import numerical_eda, visualize_data
 from core import logging_config
 from core.config import NUMERICS
@@ -71,15 +69,7 @@ def main() -> None:
             "administrative_status", "marketing_status",
             "approved_for_hospital_use", "marketing_authorization_status",
             "marketing_authorization_process"
-        ],
-        prefix=[
-            "dosage", "pharma", "act_ing", "route",
-            "admin_status", "market_status", "hospital_use",
-            "ma_status", "ma_process"
-        ],
-        prefix_sep='_',
-        dtype=uint16
-    )
+        ], dtype=uint16)
 
     # Fixme: Undersample with numerical values
     # dataframe_undersampled: pd.DataFrame = undersample_data(
@@ -110,15 +100,7 @@ def main() -> None:
             "administrative_status", "marketing_status",
             "approved_for_hospital_use", "marketing_authorization_status",
             "marketing_authorization_process"
-        ],
-        prefix=[
-            "dosage", "pharma", "act_ing", "route",
-            "admin_status", "market_status", "hospital_use",
-            "ma_status", "ma_process"
-        ],
-        prefix_sep='_',
-        dtype=uint16
-    )
+        ], dtype=uint16)
     df_test["marketing_declaration_year"] = df_test[
         "marketing_declaration_date"].dt.year.astype("uint16")
     df_test["marketing_authorization_year"] = df_test[

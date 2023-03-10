@@ -4,50 +4,11 @@ Transformation script for Engineering module
 import logging
 import re
 from typing import Any
-
 import numpy as np
 import pandas as pd
 
 logger: logging.Logger = logging.getLogger(__name__)
 # TODO: Fix the Feature engineering
-
-
-def cast_column(
-        dataframe: pd.DataFrame, column: str = 'Buyer Gender',
-        d_type: Any = 'category') -> pd.DataFrame:
-    """
-    Simple transformation of datatype for a column into category
-    :param dataframe: Dataframe to transform
-    :type dataframe: pd.DataFrame
-    :param column: Dataframe column to cast
-    :type column: str
-    :param d_type: Data type to cast to
-    :type d_type: Any
-    :return: Converted dataframe
-    :rtype: pd.DataFrame
-    """
-    dataframe.loc[:, column] = dataframe[column].astype(d_type)
-    return dataframe
-
-
-def find_missing_values(
-        dataframe: pd.DataFrame) -> pd.DataFrame:
-    """
-    Remove missing values from the dataframe
-    :param dataframe: Dirty dataframe to remove missing values from
-    :type dataframe: pd.DataFrame
-    :return: Cleaned dataframe
-    :rtype: pd.DataFrame
-    """
-    missing_values: pd.Series = (dataframe.isnull().sum())
-    print(missing_values)
-    if len(missing_values) > 0:
-        logger.warning("FOUND MISSING VALUES")
-        print("FOUND MISSING VALUES")
-        print(missing_values[missing_values > 0])
-        print(missing_values[missing_values > 0] / dataframe.shape[0] * 100)
-        dataframe = dataframe.copy()
-    return dataframe
 
 
 def remove_missing_values(dataframe: pd.DataFrame) -> pd.DataFrame:
@@ -86,25 +47,6 @@ def convert_date_column(
     """
     dataframe.loc[:, date_column] = pd.to_datetime(
         dataframe[date_column], format=date_format).dt.normalize()
-    return dataframe
-
-
-def create_sale_year(
-        dataframe: pd.DataFrame, new_column: str = 'Purchase Year',
-        date_column: str = 'Purchase Date') -> pd.DataFrame:
-    """
-    Create a new column to store the year of the sale
-    :param dataframe: Dataframe to manipulate
-    :type dataframe: pd.DataFrame
-    :param new_column: New column for year of the sale
-    :type new_column: str
-    :param date_column: Column of the sale date
-    :type date_column: str
-    :return: Updated Dataframe containing the year of the sale
-    :rtype: pd.DataFrame
-    """
-    dataframe.loc[:, new_column] = dataframe[date_column].dt.year
-    # dataframe[new_column] = dataframe[new_column].astype(uint16)
     return dataframe
 
 

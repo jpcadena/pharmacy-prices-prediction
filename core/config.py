@@ -16,16 +16,8 @@ FONT_SIZE: uint8 = uint8(os.getenv('FONT_SIZE'))
 ENCODING: str = os.getenv('ENCODING')
 RE_PATTERN: str = os.getenv('RE_PATTERN')
 RE_REPL: str = os.getenv('RE_REPL')
-
 COLORS: list[str] = ["lightskyblue","coral","palegreen"]
-FIG_SIZE: tuple[uint8, uint8] = (15, 8)
-DTYPES: dict = {
-	'resultado_diagnóstico': str, 'radio': 'uint8', 'textura': 'uint8',
-	'perímetro': 'uint16', 'área': 'uint16', 'suavidad': 'float16',
-	'compacidad': 'float16', 'simetría': 'float16',
-	'dimensión_fractal': 'float16'}
-converters: dict = {
-	'TotalCharges': lambda x: float16(x.replace(' ', '0.0'))}
+FIG_SIZE: tuple[uint8, uint8] = (uint8(15), uint8(8))
 NUMERICS: list[str] = [
 	'uint8', 'uint16', 'uint32', 'uint64',
 	'int8', 'int16', 'int32',

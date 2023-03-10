@@ -4,7 +4,6 @@ Visualization script
 import logging
 import re
 from typing import Optional
-
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt

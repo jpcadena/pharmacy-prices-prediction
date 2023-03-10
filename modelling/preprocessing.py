@@ -2,7 +2,6 @@
 Preprocessing section including: Formatting, Cleaning, Anonymization, Sampling
 """
 import logging
-
 import numpy as np
 import pandas as pd
 from imblearn.under_sampling import RandomUnderSampler
@@ -10,7 +9,6 @@ from matplotlib import pyplot as plt
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.utils import resample
-
 from core.decorators import with_logging, benchmark
 
 logger: logging.Logger = logging.getLogger(__name__)

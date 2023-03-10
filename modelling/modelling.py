@@ -4,7 +4,6 @@ Neural Network using TensorFlow script
 import logging
 import numpy as np
 import pandas as pd
-
 from modelling.preprocessing import scale_data
 from modelling.train import training
 from core.decorators import with_logging, benchmark

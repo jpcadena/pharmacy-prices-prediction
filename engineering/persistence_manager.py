@@ -4,7 +4,6 @@ Persistence script
 import logging
 from enum import Enum
 from typing import Optional
-
 import joblib
 import pandas as pd
 from catboost import CatBoostRegressor
@@ -18,7 +17,6 @@ from sklearn.linear_model import LinearRegression, SGDRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from xgboost import XGBRegressor
-
 from core.config import ENCODING
 from core.decorators import with_logging, benchmark
 from modelling.preprocessing import convert_string_to_bool, \

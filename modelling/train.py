@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-
 from core.decorators import with_logging, benchmark
 
 logger: logging.Logger = logging.getLogger(__name__)

@@ -8,7 +8,6 @@ import tensorflow as tf
 from keras import backend as K
 from keras.layers import Dense, LSTM, GRU
 from keras.models import Sequential
-
 from engineering.persistence_manager import save_model
 from modelling.evaluation import evaluate_model
 from modelling.train import training
