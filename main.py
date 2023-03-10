@@ -10,6 +10,7 @@ from analysis import numerical_eda, visualize_data
 from core import logging_config
 from core.config import NUMERICS
 from engineering.extraction import extract_raw_data
+from engineering.persistence_manager import PersistenceManager
 from models.models import iterate_models, iterate_nn_models
 
 logging_config.setup_logging()
@@ -45,9 +46,6 @@ def main() -> None:
         parse_dates=['marketing_declaration_date',
                      'marketing_authorization_date'])
     numerical_eda(drugs_train)
-
-    # drugs_train_undersampled: pd.DataFrame = undersample_data(
-    #     drugs_train, 'administrative_status')
 
     active_ingredients: pd.DataFrame = extract_raw_data(
         filename='active_ingredients.csv')
@@ -94,10 +92,10 @@ def main() -> None:
     dataframe = dataframe.drop(
         ["marketing_declaration_date", "marketing_authorization_date"], axis=1)
     print(dataframe.shape)
-    # PersistenceManager.save_to_pickle(dataframe)
-    # saved: bool = PersistenceManager.save_to_csv(dataframe)
-    # print(saved)
-    # numerical_eda(dataframe)
+    PersistenceManager.save_to_pickle(dataframe)
+    saved: bool = PersistenceManager.save_to_csv(dataframe)
+    print(saved)
+    numerical_eda(dataframe)
 
     print(drugs_test.shape)
     df_test: pd.DataFrame = drugs_test.merge(active_ingredients, on="drug_id")
