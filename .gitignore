@@ -1196,3 +1196,22 @@ FodyWeavers.xsd
 # Google App Engine generated folder
 appengine-generated/
 !/models/KNeighborsRegressor.joblib
+!/models/AdaBoostRegressor.joblib
+
+!/models/CatBoostRegressor.cbm
+
+!/models/DecisionTreeRegressor.joblib
+
+!/models/GradientBoostingRegressor.joblib
+
+!/models/GRU.h5
+
+!/models/LinearRegression.joblib
+
+!/models/LSTM.h5
+
+!/models/SGDRegressor.joblib
+
+!/models/XGBRegressor.json
+
+!/models/LGBMRegressor.txt
