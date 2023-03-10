@@ -55,8 +55,6 @@ def iterate_models(
         # Fixme: Analyze these 2 ML models
         # SVR(),
         # RandomForestRegressor(),
-        # decision_tree_regressor, adaboost_regressor,
-        # gradient_boosting_regressor, xgboost, catboost, lgbm
     ]
     models.extend(boost_obj)
     model_names: list[str] = []

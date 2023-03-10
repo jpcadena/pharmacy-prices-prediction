@@ -1195,3 +1195,4 @@ FodyWeavers.xsd
 ### AppEngine template
 # Google App Engine generated folder
 appengine-generated/
+!/models/KNeighborsRegressor.joblib
